@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h2>Dashboard</h2>
+    <canvas id="myChart" width="600" height="300"></canvas>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const labels = {{ labels_json|safe }};
+        const values = {{ values_json|safe }};
+
+
+        const ctx = document.getElementById('myChart');
+        new Chart(ctx, {
+        type: 'line',
+        data: {
+        labels: labels,
+        datasets: [{
+        label: 'Valores',
+        data: values,
+        fill: false,
+        tension: 0.1
+        }]
+        },
+        });
+    </script>
+
+{% endblock %}

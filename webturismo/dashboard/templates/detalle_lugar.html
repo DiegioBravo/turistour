@@ -1,0 +1,60 @@
+<div class="card shadow-lg border-0 rounded-4 overflow-hidden" style="max-width: 420px; margin: auto;">
+
+    <!-- CARRUSEL con solo imagen principal -->
+    <div id="carouselLugar{{ lugar.id }}" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+
+            <div class="carousel-item active">
+                <img src="{{ lugar.url_imagen_principal }}" class="d-block w-100"
+                     style="height: 260px; object-fit: cover;">
+            </div>
+
+        </div>
+
+        <button class="carousel-control-prev" type="button"
+                data-bs-target="#carouselLugar{{ lugar.id }}" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+
+        <button class="carousel-control-next" type="button"
+                data-bs-target="#carouselLugar{{ lugar.id }}" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+        </button>
+
+        <div class="position-absolute bottom-0 end-0 bg-dark text-white px-2 py-1 rounded-start"
+             style="opacity: 0.8; font-size: 13px;">
+            1 / 1
+        </div>
+    </div>
+
+
+    <!-- CONTENIDO -->
+    <div class="card-body">
+
+        <h4 class="fw-bold mb-1">{{ lugar.nombre }}</h4>
+
+        <p class="text-muted mb-2" style="font-size: 14px;">
+            {{ lugar.descripcion }}
+        </p>
+
+        <div class="mb-2">
+            <span class="badge bg-primary">{{ lugar.categoria }}</span>
+
+            {% if lugar.etiquetas %}
+                {% for tag in lugar.etiquetas.split(',') %}
+                    <span class="badge bg-info text-dark">{{ tag }}</span>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="text-muted" style="font-size: 14px;">
+            <div><strong>País:</strong> {{ lugar.pais }}</div>
+            <div><strong>Ciudad:</strong> {{ lugar.ciudad }}</div>
+            <div><strong>Región:</strong> {{ lugar.region }}</div>
+            <div><strong>Dirección:</strong> {{ lugar.direccion }}</div>
+            <div><strong>Capacidad:</strong> {{ lugar.capacidad }}</div>
+            <div><strong>Servicios:</strong> {{ lugar.servicios_ofrecidos }}</div>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,40 @@
+<svg width="500" height="500" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- Maletín exterior -->
+  <rect x="110" y="90" width="380" height="200" rx="35"
+        fill="#4BA3F3" stroke="#0D3B6E" stroke-width="20"/>
+
+  <!-- Asa -->
+  <rect x="210" y="40" width="80" height="40" rx="10"
+        fill="#4BA3F3" stroke="#0D3B6E" stroke-width="20"/>
+
+  <!-- Punto de ubicación exterior -->
+  <path d="M250 130
+           C210 130 180 160 180 200
+           C180 260 250 330 250 330
+           C250 330 320 260 320 200
+           C320 160 290 130 250 130Z"
+        fill="#F47723"/>
+
+  <!-- Borde blanco del pin -->
+  <path d="M250 150
+           C218 150 195 173 195 205
+           C195 247 250 305 250 305
+           C250 305 305 247 305 205
+           C305 173 282 150 250 150Z"
+        fill="white"/>
+
+  <!-- Centro del pin -->
+  <circle cx="250" cy="205" r="28" fill="#F47723"/>
+
+  <!-- Texto Touristour -->
+  <text x="250" y="420"
+        font-family="Arial, sans-serif"
+        font-size="70"
+        font-weight="700"
+        text-anchor="middle"
+        fill="#0D3B6E">
+    Touristour
+  </text>
+
+</svg>
