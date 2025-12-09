@@ -1,0 +1,276 @@
+<!-- INICIA LA PARTE DE CONTENIDO DE LA PAGINA DASHBOARD, MAPA Y TARJETAS -->
+            
+            <style>
+                /* Contenedor general dividido en dos columnas */
+                .layout-container {
+                    display: flex;
+                    height: 80vh; /* Ajusta la altura que quieres que ocupe */
+                    overflow: hidden;
+                }
+
+                /* Columna izquierda (tarjetas) */
+                .left-column {
+                    width: 45%;
+                    overflow-y: auto;
+                    padding-right: 15px;
+                }
+
+                /* Columna derecha (mapa) */
+                .right-column {
+                    width: 55%;
+                    position: sticky;
+                    top: 0;
+                    height: 80vh; /* igual que el contenedor */
+                }
+
+                /* Tarjeta estilo simple (puedes mejorarla luego) */
+                .card-sitio {
+                    background: white;
+                    border-radius: 10px;
+                    padding: 10px;
+                    margin-bottom: 15px;
+                    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+                }
+
+                .card-sitio img {
+                    width: 100%;
+                    height: 300px;
+                    object-fit: cover;
+                    border-radius: 8px;
+                }
+
+                .hotel-card.selected {
+                    border: 2px solid #0d6efd;
+                    box-shadow: 0 0 12px rgba(0, 123, 255, 0.4);
+                }
+                .card-sitio{
+                  cursor: pointer;
+                }
+                .card-sitio:hover{
+                  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+                  transform: translateY(-2px);
+                  transition: all 0.3s ease;
+                }
+            </style>
+
+            <div class="layout-container">
+                
+                <div class="left-column">
+                    {% for e in empresas %}
+                    <div class="card-sitio" data-id="{{ forloop.counter0 }}">
+                        <img src="{{ e.url_imagen_principal }}" alt="{{ e.nombre }}">
+                        <h4 style="margin-top: 10px;">{{ e.nombre }}</h4>
+                        <p>{{ e.descripcion|truncatechars:120 }}</p>
+                        <p><strong>{{ e.ciudad }}</strong>, {{ e.region }}, {{ e.pais }}</p>
+                        <button class="btn btn-sm btn-primary btn-gmaps" data-lat="{{ e.latitud }}" data-lng="{{ e.longitud }}">
+                            Ver ruta en Google Maps
+                        </button>
+                        <button class="btn btn-sm btn-info btn-detalles"
+                              data-id="{{ forloop.counter0 }}"
+                              data-nombre="{{ e.nombre }}"
+                              data-servicios="{{ e.servicios_ofrecidos }}"
+                              data-direccion="{{ e.direccion }}"
+                              data-capacidad="{{ e.capacidad }}"
+                              data-galeria="{{ e.galeria_imagenes }}">
+                          Ver detalles
+                      </button>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="right-column">
+                    <h3 id="titulo_h3" class="fw-bold mb-3">
+                        Ubicación de Sitios Turísticos
+                    </h3>
+
+                    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+                    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+                    <div id="map" style="width: 100%; height: 100%; border-radius: 10px;"></div>
+
+                  <script>
+                        document.addEventListener("DOMContentLoaded", (event) => {
+                          const empresas = {{ empresas_json|safe }};
+                          
+                          window.map = L.map('map').setView([2.4485, -76.6073], 11); // Colocar ubicacion del gps como punto inicial
+                          const markers = [];
+
+                          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            maxZoom: 19,
+                          }).addTo(map);
+
+                          empresas.forEach((e, index) => {
+                            index = empresas.indexOf(e);
+                            const marker = L.marker([e.lat, e.lng]).addTo(map).bindPopup(e.nombre);
+                            markers.push(marker);
+                            marker.on('click', () => {
+                              console.info(index);
+                              document.querySelectorAll('.card-sitio').forEach(card => {
+                                card.style.backgroundColor = '#fff';
+                              });
+                              
+                              const card = document.querySelector(`.card-sitio[data-id="${index}"]`);
+                              if (card) {
+                                card.style.backgroundColor = '#78adb4ff';
+
+                                card.scrollIntoView({
+                                  behavior: "smooth",
+                                  block: "center"
+                                });
+                              }
+
+                            });
+                          });
+                          
+                          console.info(empresas);
+
+                          document.querySelectorAll('.card-sitio').forEach(card => {
+                            card.addEventListener('click', function () {
+                                const este = this;  
+                                const index = this.getAttribute('data-id');
+                                const empresa = empresas[index];
+                                
+                                map.setView([empresa.lat, empresa.lng], 17);
+
+                                document.querySelectorAll('.card-sitio').forEach(card => {
+                                  card.style.backgroundColor = '#fff';
+                                });
+
+
+                                este.style.backgroundColor = '#78adb4ff';
+                                markers[index].fire('click');
+                            });
+                          });
+                          let userLat = null;
+                          let userLng = null;
+                          
+                          navigator.geolocation.getCurrentPosition(
+                              (position) => {
+                                  lat = position.coords.latitude;
+                                  lng = position.coords.longitude;
+
+                                  L.marker([lat, lng], {
+                                      icon: L.icon({
+                                          iconUrl: "https://cdn-icons-png.flaticon.com/512/684/684908.png",
+                                          iconSize: [35, 35]
+                                      })
+                                  })
+                                  .addTo(map)
+                                  .bindPopup("Estás aquí");
+
+                                  map.setView([lat, lng], 15);
+                              },
+                              () => {
+                                  console.warn("No se pudo obtener la ubicación del usuario.");
+                              }
+                          );
+
+                          document.querySelectorAll('.btn-gmaps').forEach(btn => {
+                              btn.addEventListener('click', function (e) {
+                                  e.stopPropagation(); // evita que seleccione la tarjeta
+
+                                  const lat = this.getAttribute('data-lat').replace(/,/g, '.');
+                                  const lng = this.getAttribute('data-lng').replace(/,/g, '.');
+
+                                  // Método universal: Google toma la ubicación actual del usuario
+                                  const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+
+                                  window.open(url, '_blank'); // abrir en nueva pestaña
+                              });
+                          });
+
+                          console.log("Mapa y marcadores creados correctamente.");
+
+                        });
+
+                  </script>
+
+                </div>
+            </div>
+
+            <!-- MODAL DE DETALLES -->
+            <div class="modal fade" id="modalDetalles" tabindex="-1">
+              <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitulo">Detalles del sitio</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                  </div>
+
+                  <div class="modal-body">
+
+                    <!-- Carrusel -->
+                    <div id="carouselGaleria" class="carousel slide mb-3" data-bs-ride="carousel">
+                      <div class="carousel-inner" id="carousel-inner"></div>
+
+                      <button class="carousel-control-prev" type="button" data-bs-target="#carouselGaleria" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                      </button>
+                      <button class="carousel-control-next" type="button" data-bs-target="#carouselGaleria" data-bs-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                      </button>
+                    </div>
+
+                    <!-- Info -->
+                    <p><strong>Dirección:</strong> <span id="modalDireccion"></span></p>
+                    <p><strong>Capacidad:</strong> <span id="modalCapacidad"></span></p>
+                    <p><strong>Servicios:</strong></p>
+                    <p id="modalServicios"></p>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- JAVASCRIPT PARA POBLAR EL MODAL -->
+            <script>
+              document.addEventListener("DOMContentLoaded", () => {
+
+                  // Detectar clicks en botones "Ver detalles"
+                  document.querySelectorAll('.btn-detalles').forEach(btn => {
+                      btn.addEventListener('click', function () {
+                          
+                          // Obtener datos desde atributos data-*
+                          const nombre = this.dataset.nombre;
+                          const direccion = this.dataset.direccion || "No registrada";
+                          const capacidad = this.dataset.capacidad || "No disponible";
+                          const servicios = this.dataset.servicios || "No especificado";
+                          const galeria = (this.dataset.galeria || "").split(",").map(x => x.trim()).filter(x => x);
+
+                          // Título del modal
+                          document.getElementById("modalTitulo").innerText = nombre;
+
+                          // Campos del modal
+                          document.getElementById("modalDireccion").innerText = direccion;
+                          document.getElementById("modalCapacidad").innerText = capacidad;
+                          document.getElementById("modalServicios").innerText = servicios;
+
+                          // Crear carrusel dinámicamente
+                          const carouselInner = document.getElementById("carousel-inner");
+                          carouselInner.innerHTML = ""; // limpiar
+
+                          if (galeria.length === 0) {
+                              carouselInner.innerHTML =
+                                  `<div class="carousel-item active">
+                                      <img src="https://via.placeholder.com/800x400?text=Sin+imagenes" class="d-block w-100">
+                                  </div>`;
+                          } else {
+                              galeria.forEach((url, i) => {
+                                  carouselInner.innerHTML += `
+                                  <div class="carousel-item ${i === 0 ? 'active' : ''}">
+                                      <img src="${url}" class="d-block w-100" style="height:400px; object-fit:cover;">
+                                  </div>`;
+                              });
+                          }
+
+                          // Abrir modal
+                          const modal = new bootstrap.Modal(document.getElementById("modalDetalles"));
+                          modal.show();
+                      });
+                  });
+
+              });
+              </script>
+
+
+            <!-- FINALIZA LA PARTE DE CONTENIDO DE LA PAGINA DASHBOARD, MAPA Y TARJETAS -->

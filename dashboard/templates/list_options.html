@@ -1,0 +1,69 @@
+{% load static %}
+
+<div class="sidebar" data-background-color="dark">
+    <div class="sidebar-logo">
+        <div class="logo-header" data-background-color="dark">
+            <a href="#" class="logo">
+                <img src="{% static 'img/kaiadmin/logo_light.png' %}" alt="navbar brand" class="navbar-brand" height="50" width="100"/>
+            </a>
+
+            <div class="nav-toggle">
+                <button class="btn btn-toggle toggle-sidebar">
+                    <i class="gg-menu-right"></i>
+                </button>
+                <button class="btn btn-toggle sidenav-toggler">
+                    <i class="gg-menu-left"></i>
+                </button>
+            </div>
+
+            <button class="topbar-toggler more">
+                <i class="gg-more-vertical-alt"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="sidebar-wrapper scrollbar scrollbar-inner">
+        <div class="sidebar-content">
+            <ul class="nav nav-secondary">
+
+                <li class="nav-item">
+                    <a data-bs-toggle="collapse" href="#base">
+                        <i class="fas fa-layer-group"></i>
+                        <p>Gestión</p>
+                        <span class="caret"></span>
+                    </a>
+
+                    <div class="collapse" id="base">
+                        <ul class="nav nav-collapse">
+
+                            <li>
+                                <a href="{% url 'index' %}?view=dashboard">
+                                    <i class="fa fa-eye"></i>
+                                    <span class="sub-item">Dashboard</span>
+                                </a>
+                            </li>
+                            {% if user.is_authenticated %}
+                            <li>
+                                <a href="{% url 'index' %}?view=listar">
+                                    <i class="fa fa-list"></i>
+                                    <span class="sub-item">Listas</span>
+                                </a>
+                            </li>
+                            {% endif %}
+                            {% if user.is_authenticated %}
+                            <li>
+                                <a href="{% url 'index' %}?view=registrar">
+                                    <i class="fa fa-plus"></i>
+                                    <span class="sub-item">Registrar</span>
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,77 @@
+<div class="container">
+    <div class="page-inner">
+      <div
+        class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4"
+      >
+        <div>
+          <h3 class="fw-bold mb-3">Lista de Registros</h3>
+        </div>
+        <div class="ms-md-auto py-2 py-md-0">
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-md-12">
+          <a href="{% url 'index' %}?view=registrar" class="btn btn-primary mb-3">
+              <i class="fa fa-plus"></i>&nbsp;&nbsp;Registrar Nuevo Sitio
+          </a>
+
+            <div class="container mt-4">
+              <h3 class="mb-4">Carga Masiva de Sitios Turísticos</h3>
+
+              {% if mensaje %}
+                  <div class="alert alert-success">{{ mensaje }}</div>
+              {% endif %}
+
+              {% if error %}
+                  <div class="alert alert-danger">{{ error }}</div>
+              {% endif %}
+
+              <div class="card shadow-sm p-4">
+                  <form method="POST" action="{% url 'cargar_excel' %}" enctype="multipart/form-data">
+                      {% csrf_token %}
+                      <input type="file" name="archivo" class="form-control" accept=".xlsx">
+                      <button type="submit" class="btn btn-primary mt-3">Subir</button>
+                  </form>
+
+              </div>
+        </div>
+          <table class="table table-hover">
+              <thead>
+                  <tr>
+                      <th>Nombre</th>
+                      <th>Categoría</th>
+                      <th>Ciudad</th>
+                      <th>Fecha Registro</th>
+                      <th>Acciones</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for sitio in sitios %}
+                  <tr>
+                      <td>{{ sitio.nombre }}</td>
+                      <td>{{ sitio.get_categoria_display }}</td>
+                      <td>{{ sitio.ciudad }}</td>
+                      <td>{{ sitio.fecha_registro|date:"Y-m-d H:i" }}</td>
+                      <td>
+                          {% comment %} <a href="{% url 'editar_sitio' sitio.id %}" class="btn btn-primary btn-sm">Editar</a> {% endcomment %}
+                          <a href="{% url 'editar_sitio' sitio.id %}?view=editar" class="btn btn-primary btn-sm">
+                              Editar
+                          </a>
+                      </td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                      <td colspan="5" class="text-center">No hay sitios registrados.</td>
+                  </tr>
+                  {% endfor %}
+              </tbody>
+          </table>
+        </div>
+        
+        
+      </div>
+      
+      
+    </div>
+  </div>
