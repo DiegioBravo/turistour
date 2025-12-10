@@ -28,12 +28,10 @@ class SitioTuristicoForm(forms.ModelForm):
             'ciudad': forms.TextInput(attrs={'placeholder': 'Ej: Chiquinquirá'}),
             'direccion': forms.TextInput(attrs={'placeholder': 'Dirección exacta del sitio'}),
             'latitud': forms.NumberInput(attrs={
-                'step': '0.000001',
-                'placeholder': 'Ej: 5.616123'
+                'placeholder': 'Escribir o Señalar en el mapa'
             }),
             'longitud': forms.NumberInput(attrs={
-                'step': '0.000001',
-                'placeholder': 'Ej: -73.816123'
+                'placeholder': 'Escribir o Señalar en el mapa'
             }),
             'capaciad': forms.TextInput(attrs={
                 'placeholder': 'Ej: 150 personas'
